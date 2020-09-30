@@ -1,4 +1,4 @@
-import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity/src';
+import { createEntityAdapter, EntityAdapter, EntityState } from '@ngrx/entity';
 import { Action, createReducer, on, State } from '@ngrx/store';
 import * as todoActions from '../actions/todos.actions';
 
@@ -40,6 +40,6 @@ export const todoReducer = createReducer(
     on(todoActions.removeTodo, (state, { todoId }) => adapter.removeOne(todoId, state))
 )
 
-export function reducer(state: AppState | undefined, action: Action) {
+export function reducer(state: TodoState | undefined, action: Action) {
     return todoReducer(state, action);
 }

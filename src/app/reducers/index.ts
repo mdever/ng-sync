@@ -13,7 +13,7 @@ export interface AppState {
 }
 
 export const reducers: ActionReducerMap<AppState> = {
-
+  todos: fromTodos.todoReducer
 };
 
 
