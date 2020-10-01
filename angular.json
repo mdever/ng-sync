@@ -66,7 +66,8 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "ng-sync:build"
+            "browserTarget": "ng-sync:build",
+            "sourceMap": true
           },
           "configurations": {
             "production": {
@@ -123,6 +124,12 @@
           }
         }
       }
-    }},
-  "defaultProject": "ng-sync"
+    }
+  },
+  "defaultProject": "ng-sync",
+  "schematics": {
+    "@schematics/angular:component": {
+      "styleext": "scss"
+    }
+  }
 }

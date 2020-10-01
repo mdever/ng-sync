@@ -5,15 +5,18 @@ import {
   createSelector,
   MetaReducer
 } from '@ngrx/store';
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 import * as fromTodos from './todos.reducer';
+import * as fromCounter from './counter.reducer';
 
 export interface AppState {
   todos: fromTodos.TodoState;
+  counter: fromCounter.CounterState;
 }
 
 export const reducers: ActionReducerMap<AppState> = {
-  todos: fromTodos.todoReducer
+  todos: fromTodos.reducer,
+  counter: fromCounter.reducer
 };
 
 

@@ -1,0 +1,26 @@
+<div class="counter">
+
+    <p>The current count is {{count$ | async}}</p>
+    <button
+        id="counterDown"
+        (click)="decreaseCount()">Decrease</button>
+    <button
+        id="counterUp"
+        (click)="increaseCount()">Increase</button>
+
+
+    <form>
+        <input type="text" name="name" [(ngModel)]="name"/>
+        <input type="text" name="purpose" [(ngModel)]="purpose"/>
+        <button (click)="addNewItem()">Add</button>
+    </form>
+    <button (click)="refreshItems()">Refresh</button>
+    <ul>
+        <li class="outer" *ngFor="let doc of docs">
+            <ul>
+                <li class="inner">Name: {{doc.doc.name}}</li>
+                <li>Purpose: {{doc.doc.purpose}}</li>
+            </ul>
+        </li>
+    </ul>
+</div>

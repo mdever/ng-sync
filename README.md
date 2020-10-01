@@ -1,27 +1,18 @@
 # NgSync
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 10.1.3.
+This is a POC for a PouchDB/CouchDB backed Store for in an ngrx application  
 
-## Development server
+To run CouchDB locally, build the docker image defined in the Dockerfile.  
+`docker build . -t local-couchdb`  
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Run with  
+`docker run -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=password -p 5984:5984 local-couchdb`  
 
-## Code scaffolding
+The docker image is not fully configured and you'll need to manually curl some commands in. Once its running, in a separate terminal run  
+`curl -X PUT http://admin:password@localhost:5984/_users`  
+`curl -X PUT http://admin:password@localhost:5984/_replicators`  
+`curl -X PUT http://admin:password@localhost:5984/_global_changes`  
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Obviously some things are not complete. Most glaringly, the connections to CouchDB are using Basic authentication with the username/password hardcoded in to the SPA.  In reality, this would probably be done through a proxy server.  
 
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+I have no idea the scalability with something like this. It creates a new database per session. However that is a typical approach with a tool like CouchDB so maybe its doable.
