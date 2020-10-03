@@ -19,5 +19,12 @@ export const reducers: ActionReducerMap<AppState> = {
   counter: fromCounter.reducer
 };
 
+function logReducer(reducer: ActionReducer<any>): ActionReducer<any> {
+  return function(state, action) {
+    console.log("Processing action: ");
+    console.log(action);
+    return reducer(state, action);
+  }
+}
 
-export const metaReducers: MetaReducer<AppState>[] = !environment.production ? [] : [];
+export const metaReducers: MetaReducer<AppState>[] = !environment.production ? [logReducer] : [];
