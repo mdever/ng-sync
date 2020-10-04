@@ -72,6 +72,7 @@ export class RemoteStateReceived implements Action {
 
 function pouchdbMetaReducer(reducer: ActionReducer<any>): ActionReducer<any> {
 
+  let rev;
   return function(state, action: Action) {
     let nextState;
     let pouchdb = localdbFactory();
@@ -88,11 +89,15 @@ function pouchdbMetaReducer(reducer: ActionReducer<any>): ActionReducer<any> {
       nextState = reducer(state, action);
     } else if (action.type === REMOTE_STATE_RECEIVED) {
       nextState = (<RemoteStateReceived> action).remoteState;
+      rev = nextState._rev;
 
     } else if (pouchdb) {
       console.log('pouchdb exists');
       nextState = reducer(state, action);
-      pouchdb.put(JSON.parse(JSON.stringify({_id: DB_NAME, ...nextState})));
+      pouchdb.get(DB_NAME).then(previousState => {
+        let nextRemote = {_id: DB_NAME, _rev: previousState._rev, ...nextState };
+        pouchdb.put(nextRemote);
+      });
     } else {
       nextState = reducer(state, action);
     }
