@@ -62,7 +62,7 @@ const UPDATE_ACTION = '@ngrx/store/update-reducers';
 
 export class RehydrateFromRemote implements Action {
   type = REHYDRATE_FROM_REMOTE;
-  constructor(public pouchdb: any, public store: Store) {}
+  constructor(public doneObs: Subject<any>) {}
 }
 
 export class RemoteStateReceived implements Action {
@@ -80,15 +80,14 @@ function pouchdbMetaReducer(reducer: ActionReducer<any>): ActionReducer<any> {
     console.log('Current state is: ');
     console.log(state);
     if (action.type === REHYDRATE_FROM_REMOTE) {
-      pouchdb = (<RehydrateFromRemote> action).pouchdb;
-      let store = (<RehydrateFromRemote> action).store;
+      let done$ = (<RehydrateFromRemote> action).doneObs;
       
       pouchdb.get(DB_NAME).then(savedState => {
-        store.dispatch(new RemoteStateReceived(savedState));
+        done$.next(savedState);
       });
-
+      nextState = reducer(state, action);
     } else if (action.type === REMOTE_STATE_RECEIVED) {
-      nextState = (<RemoteStateReceived> action).remoteState.doc;
+      nextState = (<RemoteStateReceived> action).remoteState;
 
     } else if (pouchdb) {
       console.log('pouchdb exists');

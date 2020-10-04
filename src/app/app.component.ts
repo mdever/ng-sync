@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
-import { Observable } from 'rxjs';
-import { POUCHDB_OBSERVABLE_TOKEN, RehydrateFromRemote } from './app.module';
+import { Observable, Subject } from 'rxjs';
+import { POUCHDB_OBSERVABLE_TOKEN, RehydrateFromRemote, RemoteStateReceived } from './app.module';
 import { filter, take } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 
@@ -18,7 +18,11 @@ export class AppComponent {
       filter(pouchdb => !!pouchdb),
       take(1)
     ).subscribe(pouchdb => {
-      this._store.dispatch(new RehydrateFromRemote(pouchdb, _store));
+      let done$ = new Subject<any>();
+      done$.subscribe(remoteData =>{
+        this._store.dispatch(new RemoteStateReceived(remoteData));
+      });
+      this._store.dispatch(new RehydrateFromRemote(done$));
     });
   }
 }
