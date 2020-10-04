@@ -40,6 +40,25 @@ export const todoReducer = createReducer(
     on(todoActions.removeTodo, (state, { todoId }) => adapter.removeOne(todoId, state))
 )
 
+const {
+    selectIds,
+    selectEntities,
+    selectAll,
+    selectTotal,
+  } = adapter.getSelectors();
+   
+  // select the array of user ids
+  export const selectTodoIds = selectIds;
+   
+  // select the dictionary of user entities
+  export const selectTodoEntities = selectEntities;
+   
+  // select the array of users
+  export const selectAllTodos = selectAll;
+   
+  // select the total user count
+  export const selectTodoTotal = selectTotal;
+
 export function reducer(state: TodoState | undefined, action: Action) {
     return todoReducer(state, action);
 }

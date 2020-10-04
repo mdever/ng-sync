@@ -1,0 +1,9 @@
+<form id="new-todo" [formGroup]="todoForm" (ngSubmit)="onSubmit()">
+    <label for="description">Description</label>
+    <input id="description" type="todoText" formControlName="todoText"/>
+
+    <label for="dueDate">Due Date</label>
+    <input id="dueDate" type="date" formControlName="dueDate"/>
+
+    <input type="submit"/>
+</form>

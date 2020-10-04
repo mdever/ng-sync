@@ -9,6 +9,7 @@ import { CounterModule } from './counter/counter.module';
 
 import * as PouchDB from 'pouchdb-browser';
 import { Observable, ReplaySubject, Subject } from 'rxjs';
+import { TodoModule } from './todo/todo.module';
 
 let localdb = null;
 let remotedb = null;
@@ -41,7 +42,7 @@ function initPouchDB() {
       localStorage.setItem(SESSION_ID_KEY, sessionId);
     }
     localdb = new PouchDB(sessionId);
-    remotedb = new PouchDB('http://localhost:5984/' + sessionId, {
+    remotedb = new PouchDB('http://localhost:5984/user_sessions', {
       ajax: {
         headers: {
           Authorization: 'Basic ' + window.btoa('admin' + ':' + 'password')
@@ -73,7 +74,11 @@ export class RemoteStateReceived implements Action {
 function pouchdbMetaReducer(reducer: ActionReducer<any>): ActionReducer<any> {
 
   let rev;
+  let documentName = null;
   return function(state, action: Action) {
+    if (documentName === null) {
+      documentName = localStorage.getItem(SESSION_ID_KEY);
+    }
     let nextState;
     let pouchdb = localdbFactory();
     console.log('Current action is: ');
@@ -82,11 +87,14 @@ function pouchdbMetaReducer(reducer: ActionReducer<any>): ActionReducer<any> {
     console.log(state);
     if (action.type === REHYDRATE_FROM_REMOTE) {
       let done$ = (<RehydrateFromRemote> action).doneObs;
-      
-      pouchdb.get(DB_NAME).then(savedState => {
-        done$.next(savedState);
-      });
       nextState = reducer(state, action);
+      pouchdb.get(documentName).then(savedState => {
+        done$.next(savedState);
+      }, err => {
+        console.log('could not retrieve');
+        pouchdb.put({_id: documentName, ...nextState});
+      });
+
     } else if (action.type === REMOTE_STATE_RECEIVED) {
       nextState = (<RemoteStateReceived> action).remoteState;
       rev = nextState._rev;
@@ -94,8 +102,8 @@ function pouchdbMetaReducer(reducer: ActionReducer<any>): ActionReducer<any> {
     } else if (pouchdb) {
       console.log('pouchdb exists');
       nextState = reducer(state, action);
-      pouchdb.get(DB_NAME).then(previousState => {
-        let nextRemote = {_id: DB_NAME, _rev: previousState._rev, ...nextState };
+      pouchdb.get(documentName).then(previousState => {
+        let nextRemote = {_id: documentName, _rev: previousState._rev, ...nextState };
         pouchdb.put(nextRemote);
       });
     } else {
@@ -116,7 +124,8 @@ function pouchdbMetaReducer(reducer: ActionReducer<any>): ActionReducer<any> {
     StoreModule.forRoot(reducers, {
       metaReducers: [...metaReducers, pouchdbMetaReducer] 
     }),
-    CounterModule
+    CounterModule,
+    TodoModule
   ],
   providers: [
     { provide: APP_INITIALIZER, useFactory: initPouchDB, multi: true },

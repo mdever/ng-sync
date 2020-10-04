@@ -12,15 +12,9 @@ import { selectCount } from '../ngrx-common/selectors/counter.selector';
 })
 export class CounterComponent implements OnInit {
 
-  constructor(private _store: Store, @Inject(POUCHDB_TOKEN) pouchdb: any) { 
-    this._pouchdb = pouchdb;
-  }
+  constructor(private _store: Store) { }
 
-  private _pouchdb: any;
   count$: Observable<number>;
-  name: string;
-  purpose: string;
-  docs: any;
 
   ngOnInit(): void {
     this.count$ = this._store.select(selectCount);
@@ -33,18 +27,4 @@ export class CounterComponent implements OnInit {
   decreaseCount(): void {
     this._store.dispatch(counterDown());
   }
-
-  addNewItem() {
-    if (this.name === '' || this.purpose === '') {
-      console.log('must add name and purpose');
-    }
-    this._pouchdb.post({name: this.name, purpose: this.purpose});
-  }
-
-  refreshItems() {
-    this._pouchdb.allDocs({include_docs: true}).then((docs) => {
-      this.docs = docs.rows;
-    })
-  }
-
 }
